@@ -54,3 +54,77 @@ const ItemSchema = new Schema({
 // Exports the model
 module.exports = Item = mongoose.model('item', ItemSchema);
 ```
+
+### Express GET, POST, DELETE Requests Using the Model
+To set up the routes for the back end, we first create a directory called `routes/api`. Here is an example with `items.js`:
+```javascript
+const express = require("express");
+const router = express.Router();
+
+// Item Model
+const Item = require("../../models/Item");
+
+// The slash represents api/items already
+router.get("/", (req, res) => {
+    Item.find()
+        .sort({ date: -1 }) // Sorts items by date in descending order
+        .then(items => res.json(items))
+});
+
+
+router.post("/", (req, res) => {
+    const newItem = new Item({
+        name: req.body.name,
+    });
+
+    newItem.save().then(item => res.json(item))
+});
+
+
+router.delete("/:id", (req, res) => {
+    Item.findById(req.params.id) // Fetches the id from the url
+        .then(item => item.remove().then(() => res.json({success: true})))
+        .catch(err => res.status(404).json({success: false}));
+});
+
+module.exports = router;
+```
+
+### Connecting Server to Routes
+Now we want our server to execute the functions above whenever a request is sent to the correct urls. To do this, we go back to `server.js` and add:
+```javascript
+app.use('/api/items', require('./routes/api/items.js'));
+```
+This connects the url `/api/items` to the router. Finally, we want to listen to a port or any other port you may have put in your `.env` file:
+```javascript
+const port = process.env.PORT || 5000;
+app.listen(port, () => console.log(`Server started on port ${port}`));
+```
+
+### Connect to Mongo
+In the `.env` file, we add in
+```
+REACT_APP_MONGO_URI=<YOUR_MONGO_URI>
+```
+Then, to connect to MongoDB in `server.js`, we do this:
+```javascript
+const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: <INSERT_DB_NAME_HERE>,
+}
+// Connect to Mongo
+mongoose
+    .connect(process.env.REACT_APP_MONGO_URL, options)
+    .then(() => console.log("MongoDB Connected..."))
+    .catch(err => console.log(err));
+```
+Congratulations, you finished setting up the back end for development.
+
+## Setting Up The Front End
+Create a `client` folder and go into that directory. Now, you can create your front end by running `create-react-app .`.
+
+Go into the `package.json` in the `client` directory and add in the following key-value pair:
+`"proxy": "http://localhost:5000"`
+
+This will make it so that when you send a get request to `/api/items`, it will automatically add the proxy to the beginning.
