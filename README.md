@@ -111,6 +111,7 @@ Then, to connect to MongoDB in `server.js`, we do this:
 const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
     dbName: <INSERT_DB_NAME_HERE>,
 }
 // Connect to Mongo
@@ -128,3 +129,20 @@ Go into the `package.json` in the `client` directory and add in the following ke
 `"proxy": "http://localhost:5000"`
 
 This will make it so that when you send a get request to `/api/items`, it will automatically add the proxy to the beginning.
+
+Now, add the following to the `"scripts"` section of the `package.json` file for the server. This will allow you to run both the server and client with one command.
+```javascript
+"client": "npm start --prefix client"
+"dev": "concurrently \"npm run server\" \"npm run client\""
+"client-install": "npm install --prefix client"
+```
+Now, you can create your React application within the client folder with any kind of structure that you want.
+
+### Setting Up Redux
+#### Action Types
+The first thing you want to do is to think about what kind of state you will have and what kind of actions can operate on that state. Create a folder called `actions` within the `src` folder of your `client`. Add a file called `types.js`. This file will just export action names like so:
+```javascript
+export const ADD_ITEM = "ADD_ITEM";
+export const GET_ITEMS = "GET_ITEMS";
+```
+#### Creating the Actions
