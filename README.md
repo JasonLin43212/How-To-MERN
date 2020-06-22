@@ -4,7 +4,7 @@ The purpose of this document is mainly a reference for me in the future if I wan
 ## Setting Up the Back End
 1. First, create the directory for your project.
 2. `cd` into that directory and run `npm init` to create a `package.json`.
-3. Let's install some packages: `npm i express mongoose concurrently`. This will install express, which is used for the back end, mongoose, which is used to interact with MongoDB, and concurrently, which allows you to run the client and server at the same time.
+3. Let's install some packages: `npm i express mongoose concurrently dotenv`. This will install express, which is used for the back end, mongoose, which is used to interact with MongoDB, and concurrently, which allows you to run the client and server at the same time.
 4. We will install nodemon, which allows for the page to automatically reload when we make changes to our code:
 `npm i -D nodemon`. The `-D` means that this package is only for development, not production.
 5. Finally, go to the `package.json` and add the following to the `"scripts"` object:
