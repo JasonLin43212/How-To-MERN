@@ -138,11 +138,90 @@ Now, add the following to the `"scripts"` section of the `package.json` file for
 ```
 Now, you can create your React application within the client folder with any kind of structure that you want.
 
-### Setting Up Redux
-#### Action Types
-The first thing you want to do is to think about what kind of state you will have and what kind of actions can operate on that state. Create a folder called `actions` within the `src` folder of your `client`. Add a file called `types.js`. This file will just export action names like so:
+### Using React Context
+Create a folder in `/src/` called `contexts`. Then create a file called `ThemeContext.js`;
+
+Create the context with the provider.
 ```javascript
-export const ADD_ITEM = "ADD_ITEM";
-export const GET_ITEMS = "GET_ITEMS";
+import React, { Component, createContext } from 'react';
+
+export const ThemeContext = createContext();
+
+class ThemeContextProvider extends Component {
+    // Data that you want in context
+    state = {
+        isLightTheme: true,
+        light: { text: '#555', ui: '#ddd', bg: '#eee' },
+        dark: { text: '#ddd', ui: '#333', bg: '#555' },
+    }
+
+    // Putting this function inside the value attribute will allow us to change the theme
+    toggleTheme = () => {
+        this.setState({ isLightTheme: !this.state.isLightTheme });
+    }
+
+    // Value is the data that gets provided to anything that is wrapped by the Provider
+
+    // children is the children in App.js
+    render() {
+        return (
+            <ThemeContext.Provider
+             value={{...this.state, toggleTheme: this.toggleTheme}}>
+                {this.props.children}
+            </ThemeContext.Provider>
+        );
+    }
+}
+
+export default ThemeContextProvider;
 ```
-#### Creating the Actions
+
+In App.js:
+```javascript
+import ThemeContextProvider from './contexts/ThemeContextProvider';
+
+class App extends Component {
+    render() {
+        return (
+            <div>
+                <ThemeContextProvider>
+                    <OtherStuffInApp />
+                </ThemeContextProvider>
+            </div>
+        );
+    }
+}
+```
+
+#### How to Use Data from Context
+Inside of whatever component you want to use the context:
+```javascript
+import { ThemeContext } from '../contexts/ThemeContext';
+
+// Say what context you want to consume by putting this in the component
+static contextType = ThemeContext;
+```
+
+This will attach the context to a context property. You can access it with `this.context` inside of the component.
+
+You can also consume the context by using a context consumer to wrap it around the entire thing and then writing a function that takes in a context and outputs everything else.
+```javascript
+import { ThemeContext } from '../contexts/ThemeContext';
+
+// in render
+// Can use this for multiple contexts
+return (
+    <ThemeContext.Consumer>
+        {context => {
+            return (
+                // Rest of JSX code
+            )
+        }}
+    </ThemeContext.Consumer>
+)
+```
+
+#### Multiple Contexts
+Create multiple contexts in the `/contexts/` folder and nest the Providers inside of `App.js`.
+
+To consume multiple contexts in a component, nest multiple Consumer tags. Make sure that the parameter in the function has different names.
